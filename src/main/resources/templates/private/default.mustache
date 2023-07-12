@@ -1,0 +1,65 @@
+{{> /common/header }}
+<div class="py-2 border-bottom d-flex justify-content-between">
+	<h5 class="fs-5">#개인 프로필과 내가 참여중인 활동을 확인하세요.</h5>
+</div>
+<div class="row p-3">
+	<!-- 개인 프로필 및 프로필 변경 링크 -->
+	<div class="col-md-3 card p-2">
+		{{#user.userDetail.avatar }} <img src="{{url}}" width="90%" />
+		{{/user.userDetail.avatar }}
+		<div class="fs-5 text-secondary mb-2">@ {{user.id }}
+			({{user.nick}} )</div>
+		<div>
+			<a href="/private/modify" class="btn btn-info text-white"
+				style="width: 100%">프로필 수정</a>
+		</div>
+	</div>
+	<!-- 유저의 활동 확인 및 링크 -->
+	<div class="col-md-9 ps-4">
+		<div class="alert alert-info mb-4" role="alert">
+			@{{user.id }} 님이 <b>주최중</b>인 모임과 <b>참여중</b>인 모임을 간략히 확인할 수 있습니다.
+		</div>
+		<div class="">
+			<h5>#주최중인 모임 정보</h5>
+			<div class="flex-wrap row px-1">
+				{{#user.moims }}
+				<div class="col-md-6 px-1 py-2" style="font-size: 0.7em">
+					<div class="card">
+						<div class="card-body">
+							<h5 class="card-title mb-1 text-info">{{title}}</h5>
+							<p class="card-text" >
+								<span class="badge text-bg-primary" style="background-color: black">{{cate}}</span></p>
+							<div class="text-end">
+								<a href="/moim/detail?id={{id}}"
+									class="stretched-link link-secondary" style="font-size: 0.5rem">자세히</a>
+							</div>
+						</div>
+					</div>
+				</div>
+				{{/user.moims }}
+			</div>
+		</div>
+		<div class="">
+			<h5>#참가중인 모임 정보</h5>
+			<div class="flex-wrap row px-1">
+				{{#joinMoim }}
+				<div class="col-md-6 px-1 py-2" style="font-size: 0.7em">
+					<div class="card">
+						<div class="card-body">
+							<h5 class="card-title mb-1 text-info">{{moim.title}}</h5>
+							<p class="card-text" >
+								<span class="badge text-bg-primary" style="background-color: black">{{moim.cate}}</span></p>
+							<div class="text-end">
+								<a href="/moim/detail?id={{moim.id}}"
+									class="stretched-link link-secondary" style="font-size: 0.5rem">자세히</a>
+							</div>
+						</div>
+					</div>
+				</div>
+				{{/joinMoim }}
+			</div>
+		</div>
+	</div>
+</div>
+{{ #user }}
+{{ /user }} {{ > /common/footer }}

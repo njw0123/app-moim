@@ -1,0 +1,78 @@
+{{> /common/header }}
+<div class="py-2 border-bottom">
+	<h5 class="fs-5">#찾아낸 사용자들과 놀라운 이야기를 나눠보세요.</h5>
+</div>
+<form class="my-2 p-2" method="get" action="/search">
+	<div class="d-flex justify-content-end g-3">
+		<div class="px-1">
+			<input type="text" class="form-control" name="q" value="{{query}}" />
+		</div>
+		<div class="px-1">
+			<button class="btn btn-outline-primary form-control">검색</button>
+		</div>
+	</div>
+</form>
+<div class="bg-body rounded shadow-sm p-2">
+	<h6 class="border-bottom pb-2">#사용자들</h6>
+	<!-- 검색 유저 보여주는 영역 -->
+	{{#result }}
+	<div class="d-flex text-body-seconadry py-1 align-items-center">
+		{{#avatarUrl}}
+			<img src="{{.}}" style="width: 48px" class="me-2" />
+		{{/avatarUrl}}
+		{{^avatarUrl}}
+			<i class="bi bi-person-square me-2 fs-1 px-1"></i>
+		{{/avatarUrl}}
+		<div>
+			<b class="text-gary-dark fs-6">@{{id}}</b> <small>{{nick}}</small> - since {{joinDay }} ({{joinTime}})
+		</div>
+		{{#login}}
+			{{#follow}}
+				<span class="mx-2"><i class="follow bi bi-heart-fill text-danger" data-user-id="{{id}}" data-status="joined"></i></span>
+			{{/follow}}
+			{{^follow}}
+				<span class="mx-2"><i class="follow bi bi-heart text-danger" data-user-id="{{id}}" data-status="not-joined"></i></span>
+			{{/follow}}
+		{{/login}}
+	</div>
+	{{/result }}
+</div>
+<script>
+	document.querySelectorAll(".follow").forEach( elm => {
+		elm.onclick = (evt)=> {
+			const target = evt.target.dataset.userId;
+			const status = evt.target.dataset.status;
+			if(status==="not-joined") {
+				const xhr = new XMLHttpRequest();
+				xhr.open("post","/api/follow",false);
+				xhr.setRequestHeader("content-type", "application/x-www-form-urlencoded");
+				xhr.send("targetId="+target);
+				const txt = xhr.responseText;
+				console.log(txt);
+				const obj = JSON.parse(txt);
+				if(obj.result) {
+					evt.target.dataset.status="joined";
+					evt.target.classList.remove("bi-heart");
+					evt.target.classList.add("bi-heart-fill");
+				}else {
+					window.alert("이미 팔로우중인 대상입니다.");
+				}
+			}else {
+				const xhr = new XMLHttpRequest();
+				xhr.open("delete","/api/follow?targetId="+target,false);
+				xhr.send();
+				const txt = xhr.responseText;
+				console.log(txt);
+				const obj = JSON.parse(txt);
+				if(obj.result) {
+					evt.target.dataset.status="not-joined";
+					evt.target.classList.remove("bi-heart-fill");
+					evt.target.classList.add("bi-heart");
+				}else {
+					window.alert("이미 팔로우 해제 되었습니다.");
+				}
+			}
+		};
+	});
+</script>
+{{ > /common/footer }}

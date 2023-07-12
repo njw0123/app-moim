@@ -1,0 +1,172 @@
+{{> /common/header }}
+<div class="py-2 border-bottom d-flex justify-content-between mb-2">
+	<h5 class="fs-5">#새로운 경험과 친구들이 기다리고 있습니다.</h5>
+</div>
+
+{{#moim }}
+<div class="p-2 mb-2 bg-dark text-white rounded-3">
+	<div class="container-fluid py-2">
+		<div class="d-flex align-items-center mb-2">
+			{{#user.userDetail.avatar.url }} <img src="{{.}}"
+				style="width: 48px" class="me-2" />
+			{{/user.userDetail.avatar.url }}
+			<div class="fs-5 text-warning">@{{user.id
+				}}({{user.nick}}) 님의 모임 <span class="badge bg-warning"><span id="cp">{{currentPerson}}</span> / {{#maxPerson}}{{.}}{{/maxPerson}}{{^maxPerson}}제한없음{{/maxPerson}}</span></div>
+		</div>
+
+		<h1 class="fw-bold">
+			{{title}} <small class="fs-6 text-secondary">{{cate}}</small>
+		</h1>
+		<p class="fs-4">{{description }}</p>
+		<p class="text-end text-black-80 fs-smaller">모임 예정일 : {{targetDate
+			}} ({{duration}}h)</p>
+	</div>
+	<!-- 참가신청 버튼 영역 -->
+	{{#isLogin}}
+		{{#isJoined}}
+		<div class="col-auto">
+			<button id="join-bt" class="btn btn-danger btn-sm" data-status="joined">참가취소하기</button>
+		</div>
+		{{/isJoined}}
+		{{^isJoined}}
+		<div class="col-auto">
+			<button id="join-bt" class="btn btn-primary btn-sm" data-status="not-joined">참가신청하기</button>
+		</div>
+		{{/isJoined}}
+	{{/isLogin}}
+</div>
+{{/moim }}
+<!-- 참가자 목록 뷰 -->
+<div class="mb-2 text-end" id="attends">
+	{{#moim.attendances }}
+		<span class="badge bg-secondary fs-6"><i class="bi bi-person-circle me-1"></i> {{user.id }}</span>
+	{{/moim.attendances }}
+</div>
+<!-- 리플 등록용 Form -->
+<div class="mb-3 border-bottom pb-2">
+	<form action="/moim/reply" method="post">
+		<input type="hidden" name="moim.id" value="{{moim.id}}" />
+		<div class="mb-2">
+			<textarea
+				 class="form-control form-control-sm" placeholder="문의 글을 남겨주세요." 
+				 name="text"
+				rows="3"></textarea>
+		</div>
+		<div class="row g-2 align-items-center justify-content-end">
+			<div class="col-auto">
+				<input type="password" 
+				class="form-control form-control-sm" name="password"
+					placeholder="비밀번호를 설정해주세요">
+			</div>
+			<div class="col-auto">
+				<button class="btn btn-dark text-white btn-sm">문의 등록</button>
+			</div>
+		</div>
+	</form>
+</div>
+
+<!-- 모임에 달린 리플 보여주기 영역 -->
+<table class="table table-sm">
+	<thead class="table-dark">
+		<tr>
+			<th scope="col" class="col-11">#</th>
+			<th scope="col" class="col-1"></th>
+		</tr>
+	</thead>
+	<tbody>
+		{{#replys }}
+		<tr>
+			<td class="align-middle">{{text}}</td>
+			<td>
+				<button class="btn btn-danger btn-sm">
+					<i class="bi bi-trash3"></i>
+				</button>
+			</td>
+		</tr>
+		{{/replys }}
+	</tbody>
+</table>
+<ul class="pagination pagination-sm justify-content-end">
+	{{#Previous}}
+		<li class="page-item"><a class="page-link" href="/moim/detail?id={{#moim}}{{id}}{{/moim}}&page={{.}}">Previous</a></li>
+	{{/Previous}}
+	{{#pages}}
+		<li class="page-item"><a class="page-link" href="/moim/detail?id={{#moim}}{{id}}{{/moim}}&page={{.}}">{{.}}</a></li>
+	{{/pages}}
+	{{#Next}}
+		<li class="page-item"><a class="page-link" href="/moim/detail?id={{#moim}}{{id}}{{/moim}}&page={{.}}">Next</a></li>
+	{{/Next}}
+</ul>
+<script>
+	document.querySelector("#join-bt").onclick = (evt) => {
+		//console.log(document.querySelector("#join-bt").dataset.status);
+		const status = document.querySelector("#join-bt").dataset.status;
+		if(status==="not-joined") {
+			sendAddAttendanceReq();
+		}else {
+			sendDelelteAttendanceReq();
+		}
+	};
+	
+	function sendAddAttendanceReq() {
+		const xhr = new XMLHttpRequest();
+		xhr.open("post","/api/attendance/join",false);
+		// 1안 ================================================================
+		xhr.setRequestHeader("content-type", "application/x-www-form-urlencoded");
+		xhr.send("moimId={{moim.id}}");
+		// 2안 =============================================================
+		// const data = new FormData();
+		// data.append("moimId", "{{moim.id}}");
+		// xhr.send(data);
+		const txt = xhr.responseText;
+		console.log(txt);
+		const obj = JSON.parse(txt);
+		if(obj.result) {
+			document.querySelector("#cp").innerHTML = obj.currentPerson;	// int
+			let idsHTML="";
+			for(var i of obj.attendUserIds) {
+				idsHTML += 
+					`<span class="badge bg-secondary fs-6 me-1 mb-1">
+						<i class="bi bi-person-circle me-1"></i>${i}
+					</span>
+					`;
+				
+			};
+			document.querySelector("#attends").innerHTML = idsHTML;
+			document.querySelector("#join-bt").innerHTML = "참가취소하기";
+			document.querySelector("#join-bt").dataset.status="joined";
+			document.querySelector("#join-bt").classList.remove("btn-primary");
+			document.querySelector("#join-bt").classList.add("btn-danger");
+		}else {
+			window.alert(obj.errorMessage);
+		}
+	}
+	
+	function sendDelelteAttendanceReq() {
+		const xhr = new XMLHttpRequest();
+		xhr.open("delete","/api/attendance/cancel?moimId={{moim.id}}",false);
+		xhr.send();
+		const obj = JSON.parse(xhr.responseText);
+		if(obj.result) {
+			document.querySelector("#cp").innerHTML = obj.currentPerson;	// int
+			let idsHTML="";
+			for(var i of obj.attendUserIds) {
+				idsHTML += 
+					`<span class="badge bg-secondary fs-6 me-1 mb-1">
+						<i class="bi bi-person-circle me-1"></i>${i}
+					</span>
+					`;
+				
+			};
+			document.querySelector("#attends").innerHTML = idsHTML;
+			document.querySelector("#join-bt").innerHTML = "참가신청하기";
+			document.querySelector("#join-bt").dataset.status="not-joined";
+			document.querySelector("#join-bt").classList.remove("btn-danger");
+			document.querySelector("#join-bt").classList.add("btn-primary");
+		}else {
+			window.alert(obj.errorMessage);
+		}
+	}
+</script>
+{{ > /common/footer }}
+

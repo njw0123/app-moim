@@ -1,0 +1,15 @@
+@charset "UTF-8";
+
+*{
+	box-sizing: border-box;
+}
+
+body{
+	margin: 0
+}
+
+.container {
+	width: 960px;
+	margin: auto;
+	min-height: 100vh;
+}

@@ -1,0 +1,57 @@
+{{> /common/header }}
+<div class="py-2 border-bottom">
+	<h5 class="fs-5">#다양한 모임을 한눈에 확인하세요.</h5>
+</div>
+<div class="text-end pt-1">
+	<a href="/moim/create" class="btn btn-success btn-sm "><i
+		class="bi bi-plus-circle me-1"></i><span>모임 개설</span></a>
+</div>
+<div class="flex-wrap row p-1">
+	{{#all }}
+		<div class="col-md-3 px-1 py-2" style="font-size: 0.7em">
+			<div class="card" >
+				<div class="card-header">
+					<span class="card-subtitle text-body-secondary ">{{cate}} ({{#currentPerson}}{{.}}{{/currentPerson}} / {{#maxPerson}}{{.}}{{/maxPerson}}{{^maxPerson}}제한없음{{/maxPerson}})</span>
+				</div>
+				<div class="card-body">
+					<h5 class="card-title mb-0">{{title}}</h5>
+					<p class="card-text" style="height: 40px; font-size: 0.9rem">
+					{{#description }}{{.}}{{/description }}
+					</p>
+					<div class="text-end">
+						<a href="/moim/detail?id={{id}}" 
+							class="stretched-link link-secondary" style="font-size:0.5rem">자세히</a>
+					</div>
+				</div>
+				<div class="card-footer text-end">
+					<span>모임날짜 : {{targetDate}} - {{joinTime}}</span>
+				</div>
+			</div>
+		</div>
+	{{/all }}
+</div>
+<ul class="pagination pagination-sm justify-content-end mt-3">
+	{{#pagination.prev.active }}
+		<li class="page-item">
+			<a class="page-link" href="/moim?page={{pagination.prev.value}}">Preivous</a></li>
+	{{/pagination.prev.active }}
+
+	{{#pagination.pages }}
+		{{#active }}
+			<li class="page-item active">
+				<a class="page-link" href="/moim?page={{value}}">{{value}}</a></li>
+		{{/active }}
+		{{^active }}
+			<li class="page-item">
+				<a class="page-link" href="/moim?page={{value}}">{{value}}</a></li>
+		{{/active }}
+	{{/pagination.pages }}
+	
+	{{#pagination.next.active }}
+		<li class="page-item">
+			<a class="page-link" href="/moim?page={{pagination.next.value}}">Next</a></li>
+	{{/pagination.next.active }}
+	
+</ul>
+{{ > /common/footer }}
+
