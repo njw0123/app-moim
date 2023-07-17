@@ -12,7 +12,7 @@ import jakarta.persistence.Table;
 @Table(name = "attendances")
 public class Attendance {
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Integer id;
 	@ManyToOne
 	@JoinColumn(name = "userId")

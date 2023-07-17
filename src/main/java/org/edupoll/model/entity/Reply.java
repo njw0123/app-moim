@@ -13,7 +13,7 @@ import jakarta.persistence.Table;
 @Table(name = "replys")
 public class Reply {
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Integer id;
 	String text;
 	String password;

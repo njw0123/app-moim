@@ -16,7 +16,7 @@ import jakarta.persistence.Table;
 @Table(name = "user_details")
 public class UserDetail {
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Integer idx;
 	String address;
 	Date birthday;
